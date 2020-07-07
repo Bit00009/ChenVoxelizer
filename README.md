@@ -1,4 +1,6 @@
-# UltraNModE Version
+# **UltraMode Version**
+
+**New Features :**
 
 + Greedy Cubic Mesher and Exporter
 + Marching Cube Mesh Extractor and Exporter
@@ -6,20 +8,27 @@
 
 ## Overview
 
-
 ----------
 
 
-This project voxelizes the meshes in STL file ***without*** the condition of *watertight*. It supports many formats only now, since we are using `assimp` library to load the file. Basically, the project can be summarized into two steps:
+This project voxelizes the meshes **without the condition of *watertight*.** It supports standard 3D formats since we're using `assimp` library to load the file. Basically, the project can be summarized into three steps:
 
-- Surface voxelization  
-    For each piece of mesh (triangle) , we check the collided voxels in either way: 
+- **Surface Voxelization** : For each piece of mesh (triangle) , we check the collided voxels in either way: 
+    
     1. Get the minimal bounding box of each triangle, check each voxel in this box with the triangle;
     2. Start at any voxel collided with the triangle, and do bfs search to check neighboring voxels.   
     
     The first way is lightweight, but may become worse when the ratio of (triangle's volume/bounding box's volume) is small. While the second way has quite large constant overhead. For each thread in thread pool, it will pick a triangle to voxelize. The time complexity is O(m*c), where m is the triangle number and c is some factor such as the voxel number in the bounding box or constant overhead of bfs.
-- Solid voxelization  
+    
+- **Solid Voxelization** :
     When equipped with surface voxelization, the solid voxelization can be simple: flood fill. We try to flood fill the outer space of the meshes like carving the wood, since it is more simple and doesn't requires *watertight* property. However, the basic flood fill with bfs is too heavy and time-consuming, optimizations are proposed here (see below). The time complexity is O(n), where n is the voxel number in the bounding box of whole mesh.
+    
+- **Voxel Meshing :** In the process, the voxels become the mesh can be used in 3D software, for now the STL, OBJ, and FBX formats are supported.
+
+    **Mesher comes in two mode :**
+
+    1. Cubic Greedy Meshing based on Minecraft https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/
+    2. Marching Cube Meshing with Box Blur filtering
 
 ## Optimizations
 ----------
@@ -43,7 +52,6 @@ This project voxelizes the meshes in STL file ***without*** the condition of *wa
 
 ## Installation
 
-
 ----------
 
 
@@ -51,6 +59,7 @@ This project requires libraries (dependencies) as follows:
 
 - *boost*
 - *libccd*
+- polyvox for mesh processing (https://github.com/ColinGilbert/polyvox)
 - *libfcl*    
   for collision checking (https://github.com/flexible-collision-library/fcl, version: tags/0.3.3)
 - *assimp*  
@@ -59,7 +68,7 @@ This project requires libraries (dependencies) as follows:
     make sure `pkg-config` is installed.
 
 
-CMakeLists.txt is used to generate makefiles. To build this project, in command line, run
+CMakeLists.txt is used to generate make files. To build this project, in command line, run
 
 ``` cmake
 mkdir build
@@ -67,10 +76,9 @@ cd build
 cmake ..
 ```
 
-Next, in linux, use `make` in 'build' directory to compile the code. 
+Next, in Linux, use `make` in 'build' directory to compile the code. 
 
 ## How to Use
-
 
 ----------
 
@@ -119,7 +127,7 @@ ofstream* output = new ofstream(p_file.c_str(), ios::out | ios::binary);
 for (x,y,z) in voxels:
   *output << x << " " << y << " " << z << endl;
 ```
-    
+
 
 
 <!--  - header
@@ -142,7 +150,6 @@ for (x,y,z) in voxels:
 
 ## Directories
 
-
 ----------
 
 
@@ -158,7 +165,6 @@ This project has folders and files as follows:
     for cmake
     
 ## Testing
-
 
 ----------
 
